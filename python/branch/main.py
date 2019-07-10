@@ -14,20 +14,18 @@ class BranchService(Service):
             template = ncs.template.Template(device)
             template.apply('service-pnp-device', vars)
 
-            if root.pnp_state.device.exists(device.pnp_id):
-                self.log.info("Device ({}) exists in PnP with state: {}".format(device.name, \
-                    root.pnp_state.device[device.pnp_id].synced))
-                if root.pnp_state.device[device.pnp_id].synced \
-                 and root.devices.device.exists(device.nso_name):
-                    for rolename in device.role:
-                        self.log.info("Applying role ({})".format(rolename))                        
-                        role = root.device_role[rolename]
-                        for templatename in role.template:
-                            self.log.info('Apply Template ({}) to device ({})'.format(templatename, \
-                                device.name))
-                            input = root.devices.device[device.nso_name].apply_template.get_input()
-                            input.template_name = templatename
-                            root.devices.device[device.nso_name].apply_template(input)
+            if root.pnp_state.device.exists(device.pnp_id) \
+             and root.pnp_state.device[device.pnp_id].synced \
+             and root.devices.device.exists(device.nso_name):
+                for rolename in device.role:
+                    self.log.info("Applying role ({})".format(rolename))                        
+                    role = root.device_role[rolename]
+                    for templatename in role.template:  
+                        self.log.info('Apply Template ({}) to device ({})'.format(templatename, \
+                            device.nso_name))
+                        input = root.devices.device[device.nso_name].apply_template.get_input()
+                        input.template_name = templatename
+                        output = root.devices.device[device.nso_name].apply_template(input)
             else:
                 kick_monitor_node = ("/pnp-state/device[serial='{}']/synced").format(device.pnp_id)
                 self.log.info('Creating Kicker Monitor on: ', kick_monitor_node)
