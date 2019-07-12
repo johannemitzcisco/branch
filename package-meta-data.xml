@@ -1,7 +1,7 @@
 <ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
   <name>branch</name>
   <package-version>0.1.1</package-version>
-  <description>Generated Python package</description>
+  <description>Services to model branch deployments with PnP</description>
   <ncs-min-version>4.7</ncs-min-version>
 
   <component>
