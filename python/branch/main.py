@@ -20,14 +20,21 @@ class BranchService(Service):
                 and root.devices.device.exists(device.nso_name)) \
                or (root.devices.device.exists(device.nso_name) \
                    and device.pnp_id is None):
-                for rolename in device.role:
-                    self.log.info("Applying role ({})".format(rolename))                        
-                    role = root.device_role[rolename]
-                    for templatename in role.template:  
-                        self.log.info('Apply Template ({}) to device ({})'.format(templatename, \
+                for servicerole in device.role:
+                    self.log.info("Applying role ({})".format(servicerole.name))                        
+                    role = root.device_role[servicerole.name]
+                    for roletemplate in role.device_template:  
+                        self.log.info('Apply Template ({}) to device ({})'.format(roletemplate.name, \
                             device.nso_name))
                         input = root.devices.device[device.nso_name].apply_template.get_input()
-                        input.template_name = templatename
+                        input.template_name = roletemplate.name
+                        if servicerole.template_variables.exists(roletemplate.name):
+                            for templatevariable in servicerole.template_variables[roletemplate.name].variable:
+                                self.log.info("Setting variable ({}) with the value: {}".format(templatevariable.name, \
+                                    templatevariable.value))
+                                variable = input.variable.create()
+                                variable.name = templatevariable.name
+                                variable.value = '"'+templatevariable.value+'"'
                         output = root.devices.device[device.nso_name].apply_template(input)
 
             else:
